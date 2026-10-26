@@ -1,0 +1,1610 @@
+¡Ese fue el motivo exacto! Al pasarte el código resumido en el mensaje anterior, coloqué puntos suspensivos (...) en las secciones de HTML para no hacer la respuesta demasiado larga, y por eso al hacer clic en las vistas aparecía literal ... en la pantalla.
+
+Aquí tienes el código 100% completo y sin omitir ninguna sección para tu archivo dashboard.html. Contiene todas las vistas restauradas (seccionTickets, seccionTemas, seccionUsuarios, seccionRoles), todos los modales y las funciones de JavaScript completas.
+
+Código Completo para dashboard.html
+HTML
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Therapedic OS | Panel Principal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .glass-nav { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); }
+    select option { background-color: #0f172a; color: #f8fafc; padding: 10px; }
+  </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col overflow-x-hidden">
+
+  <!-- TOP HEADER NAVBAR -->
+  <header class="h-16 border-b border-slate-800/80 glass-nav fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 lg:px-6">
+    <div class="flex items-center gap-4">
+      <button id="toggleSidebar" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#F67280] via-[#C06C84] to-[#355C7D] flex items-center justify-center shadow-lg shadow-[#C06C84]/20">
+          <i class="fa-solid fa-bolt text-white text-sm"></i>
+        </div>
+        <span class="font-extrabold text-lg tracking-wider text-white">Therapedic <span class="text-[#F8B195] font-normal text-sm">OS</span></span>
+      </div>
+    </div>
+
+    <!-- Buscador Global -->
+    <div class="flex-1 max-w-md mx-4 hidden md:block">
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+        <input type="text" id="inputBuscadorGlobal" onkeyup="filtrarDesdeGlobal()" placeholder="Buscar en tickets, estatus, usuarios..."
+          class="w-full pl-9 pr-4 py-2 bg-slate-900/90 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C06C84]">
+      </div>
+    </div>
+
+    <!-- Fecha y Hora -->
+    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-900/80 border border-slate-800 rounded-xl text-xs text-slate-300 font-medium">
+      <i class="fa-regular fa-clock text-[#F67280]"></i>
+      <span id="relojHeader">Cargando fecha y hora...</span>
+    </div>
+
+    <!-- Perfil Usuario -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 pl-1">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-[#F67280] to-[#6C5B7B] flex items-center justify-center text-white font-bold text-xs ring-2 ring-[#C06C84]/40" id="userAvatar">OI</div>
+        <div class="hidden lg:block text-left">
+          <h4 id="userName" class="text-xs font-bold text-white leading-none">Cargando...</h4>
+          <span id="userRole" class="text-[10px] text-[#F8B195]">Usuario</span>
+        </div>
+        <button id="btnLogout" title="Cerrar Sesión" class="p-2 text-slate-400 hover:text-[#F67280] transition ml-2">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- LATERAL SIDEBAR MENU -->
+    <aside id="sidebar" class="w-64 border-r border-slate-800/80 bg-slate-900/50 backdrop-blur-xl flex flex-col justify-between fixed lg:static top-16 bottom-0 left-0 z-40 transition-all duration-300 -translate-x-full lg:translate-x-0">
+      <div class="p-4 space-y-6 overflow-y-auto">
+
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3">Principal</span>
+          <div class="mt-2 space-y-1">
+            <button id="btnNavDashboard" onclick="mostrarSeccion('dashboard')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#C06C84] to-[#6C5B7B] text-white font-semibold text-xs shadow-lg shadow-[#C06C84]/20 transition">
+              <i class="fa-solid fa-chart-pie text-sm"></i>
+              <span>Dashboard Principal</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3">Mesa de Ayuda</span>
+          <div class="mt-2 space-y-1">
+            <button id="btnNavTickets" onclick="mostrarSeccion('tickets')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs font-semibold group">
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-ticket text-[#F67280]"></i>
+                <span>Gestión de Tickets</span>
+              </div>
+              <span id="badgeTotalTickets" class="px-2 py-0.5 rounded-full text-[10px] bg-[#C06C84]/20 text-[#F8B195] font-bold">0</span>
+            </button>
+
+            <button id="btnNavTemas" onclick="mostrarSeccion('temas')" data-privilegio="1" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs font-semibold group">
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-sitemap text-[#F8B195]"></i>
+                <span>Temas & SLAs</span>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-slate-400"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECCIÓN MENÚ PADRE: MÉTRICAS KPIS -->
+        <div id="seccionNavKpis" class="hidden">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3">Métricas KPIs</span>
+          <div class="mt-2 space-y-1">
+            <button id="btnNavSubmenuKpis" onclick="mostrarSeccion('submenuKpis')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs font-semibold group">
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-chart-column text-[#355C7D]"></i>
+                <span>Menú Métricas KPIs</span>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-slate-400"></i>
+            </button>
+
+            <!-- HIJO 1: KPIs TICKETS & SLAS -->
+            <button id="btnNavKpiTickets" onclick="mostrarSeccion('kpiTickets')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs font-semibold group pl-6 hidden">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-chart-line text-[#F8B195]"></i>
+                <span>KPIs Tickets & SLAs</span>
+              </div>
+            </button>
+
+            <!-- HIJO 2: DISPONIBILIDAD DE SISTEMAS CRÍTICOS -->
+            <button id="btnNavKpiDisponibilidad" onclick="mostrarSeccion('kpiDisponibilidad')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs font-semibold group pl-6 hidden">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-server text-emerald-400"></i>
+                <span>Sistemas Críticos</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3">Inteligencia & Reporteo</span>
+          <div class="mt-2 space-y-1">
+            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs">
+              <i class="fa-solid fa-brain text-purple-400"></i>
+              <span>Asistente IA SQL</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- SECCIÓN ADMINISTRACIÓN -->
+        <div data-privilegio="1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3">Administración</span>
+          <div class="mt-2 space-y-1">
+            <button id="btnNavRoles" onclick="mostrarSeccion('roles')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs font-semibold group">
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-users-gear text-amber-400"></i>
+                <span>Roles y Permisos</span>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-slate-400"></i>
+            </button>
+
+            <button id="btnNavUsuarios" onclick="mostrarSeccion('usuarios')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs font-semibold group">
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-user-shield text-emerald-400"></i>
+                <span>Gestión de Usuarios</span>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-slate-600 group-hover:text-slate-400"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 p-4 lg:p-8 overflow-y-auto w-full">
+
+      <!-- VISTA 1: DASHBOARD INICIO -->
+      <div id="seccionDashboard" class="space-y-6">
+        <div class="bg-gradient-to-r from-[#355C7D] via-[#6C5B7B] to-[#C06C84] p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-white mb-2">Bienvenido a Therapedic OS, <span id="bannerUser" class="text-[#F8B195]">Usuario</span></h1>
+            <p class="text-slate-200 text-xs opacity-90">Mesa de control de SLAs, disponibilidad de sistemas e indicadores operativos.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div onclick="mostrarSeccion('tickets')" class="bg-slate-900/60 border border-slate-800 hover:border-[#F67280]/50 p-6 rounded-2xl cursor-pointer transition shadow-lg group">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-12 h-12 rounded-xl bg-[#F67280]/20 flex items-center justify-center text-[#F67280]">
+                <i class="fa-solid fa-ticket text-xl"></i>
+              </div>
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-[#F8B195]">Mesa de Ayuda</span>
+            </div>
+            <h4 class="text-lg font-bold text-white group-hover:text-[#F8B195]">Gestión de Tickets</h4>
+            <p class="text-slate-400 text-xs mt-1">Creación de solicitudes, atención de incidencias e historial de mensajes.</p>
+          </div>
+
+          <!-- TARJETA PADRE: MÉTRICAS KPIS -->
+          <div id="cardKpiModuloDashboard" onclick="mostrarSeccion('submenuKpis')" class="bg-slate-900/60 border border-slate-800 hover:border-[#355C7D]/50 p-6 rounded-2xl cursor-pointer transition shadow-lg group hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-12 h-12 rounded-xl bg-[#355C7D]/20 flex items-center justify-center text-[#355C7D]">
+                <i class="fa-solid fa-chart-column text-xl"></i>
+              </div>
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-[#355C7D]">SLA & KPIs</span>
+            </div>
+            <h4 class="text-lg font-bold text-white group-hover:text-cyan-300">Métricas KPIs</h4>
+            <p class="text-slate-400 text-xs mt-1">Panel general de indicadores, reportes analíticos y métricas operativas de la organización.</p>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800 hover:border-[#C06C84]/50 p-6 rounded-2xl cursor-pointer transition shadow-lg group">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-12 h-12 rounded-xl bg-[#C06C84]/20 flex items-center justify-center text-[#C06C84]">
+                <i class="fa-solid fa-robot text-xl"></i>
+              </div>
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-[#C06C84]">IA Integration</span>
+            </div>
+            <h4 class="text-lg font-bold text-white group-hover:text-[#F8B195]">Módulo Inteligencia IA</h4>
+            <p class="text-slate-400 text-xs mt-1">Consultas en lenguaje natural conectadas a la base de datos SQL Server.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA SUBMENÚ MÉTRICAS KPIS -->
+      <div id="seccionSubmenuKpis" class="space-y-6 hidden">
+        <div class="bg-gradient-to-r from-[#355C7D] via-[#6C5B7B] to-[#C06C84] p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-white mb-2 flex items-center gap-3">
+              <i class="fa-solid fa-chart-line text-[#F8B195]"></i>
+              <span>Métricas KPIs & Reportes Operativos</span>
+            </h1>
+            <p class="text-slate-200 text-xs opacity-90">Selecciona el módulo de reporte o indicador que deseas consultar.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- TARJETA HIJO 1: KPIs TICKETS & SLAS -->
+          <div id="cardSubKpiTicket" onclick="mostrarSeccion('kpiTickets')" class="bg-slate-900/60 border border-slate-800 hover:border-[#355C7D]/50 p-6 rounded-2xl cursor-pointer transition shadow-lg group hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-12 h-12 rounded-xl bg-[#355C7D]/20 flex items-center justify-center text-[#355C7D]">
+                <i class="fa-solid fa-chart-line text-xl"></i>
+              </div>
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-[#355C7D]">SLA & KPIs</span>
+            </div>
+            <h4 class="text-lg font-bold text-white group-hover:text-cyan-300">KPIs Tickets & SLAs</h4>
+            <p class="text-slate-400 text-xs mt-1">Métricas de tiempo de atención, porcentaje de solución y cumplimiento por criticidad.</p>
+          </div>
+
+          <!-- TARJETA HIJO 2: DISPONIBILIDAD DE SISTEMAS CRÍTICOS -->
+          <div id="cardSubKpiDisponibilidad" onclick="mostrarSeccion('kpiDisponibilidad')" class="bg-slate-900/60 border border-slate-800 hover:border-emerald-500/50 p-6 rounded-2xl cursor-pointer transition shadow-lg group hidden">
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <i class="fa-solid fa-server text-xl"></i>
+              </div>
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-emerald-400">Downtime & Baseline</span>
+            </div>
+            <h4 class="text-lg font-bold text-white group-hover:text-emerald-300">Disponibilidad de Sistemas Críticos</h4>
+            <p class="text-slate-400 text-xs mt-1">Métricas de Uptime mensual para NetSuite, enlaces de red, servidores y sistemas críticos.</p>
+          </div>
+
+          <!-- MENSAJE SI EL USUARIO NO TIENE REPORTES ASIGNADOS -->
+          <div id="msgSinKpisHijos" class="hidden col-span-full bg-slate-900/40 border border-slate-800 p-8 rounded-2xl text-center space-y-2">
+            <i class="fa-solid fa-lock text-3xl text-slate-600 mb-2"></i>
+            <h3 class="text-sm font-bold text-slate-300">Sin reportes específicos asignados</h3>
+            <p class="text-xs text-slate-500 max-w-md mx-auto">Tienes acceso al módulo general de Métricas KPIs, pero no cuentas con permisos activos para ningún reporte individual. Contacta al administrador si requieres habilitarlos.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA REPORTE 1: KPIS TICKETS & SLAS -->
+      <div id="seccionKpiTickets" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-[#F8B195]"></i>
+              <span>Métricas de Tickets por Período y Criticidad (SLA)</span>
+            </h2>
+            <p class="text-slate-400 text-xs">Analítica de cumplimiento de respuesta e indicadores por prioridad</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row items-center gap-4">
+          <div class="flex items-center gap-2 text-xs text-slate-300">
+            <span>Fecha Inicio:</span>
+            <input type="date" id="kpiFechaInicio" class="p-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-[#C06C84]">
+          </div>
+          <div class="flex items-center gap-2 text-xs text-slate-300">
+            <span>Fecha Fin:</span>
+            <input type="date" id="kpiFechaFin" class="p-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-[#C06C84]">
+          </div>
+          <button onclick="cargarKpisTickets()" class="px-5 py-2 bg-gradient-to-r from-[#F67280] to-[#C06C84] hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-lg transition flex items-center gap-2">
+            <i class="fa-solid fa-rotate text-xs"></i>
+            <span>Actualizar Fechas</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Tickets</span>
+            <h3 class="text-2xl font-extrabold text-white mt-1" id="kpiTotalTickets">0</h3>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">% Cumplimiento SLA</span>
+            <h3 class="text-2xl font-extrabold text-emerald-400 mt-1" id="kpiPorcentajeSla">0%</h3>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400">SLAs Logrados</span>
+            <h3 class="text-2xl font-extrabold text-cyan-400 mt-1" id="kpiLogrados">0</h3>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-rose-400">SLAs Incumplidos</span>
+            <h3 class="text-2xl font-extrabold text-rose-400 mt-1" id="kpiIncumplidos">0</h3>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-slate-800">
+            <h3 class="text-sm font-bold text-white">Detalle Individual de Tickets y Cumplimiento SLA</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-950 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
+                <tr>
+                  <th class="p-4"># Ticket</th>
+                  <th class="p-4">Solicitante</th>
+                  <th class="p-4">Tema / Asunto</th>
+                  <th class="p-4">Prioridad (SLA)</th>
+                  <th class="p-4">Horas Transcurridas</th>
+                  <th class="p-4">Estado SLA</th>
+                </tr>
+              </thead>
+              <tbody id="tablaKpisBody" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA REPORTE 2: DISPONIBILIDAD DE SISTEMAS CRÍTICOS -->
+      <div id="seccionKpiDisponibilidad" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-server text-emerald-400"></i>
+              <span>Disponibilidad de Sistemas Críticos & Baseline Mensual</span>
+            </h2>
+            <p class="text-slate-400 text-xs">Análisis de Uptime por infraestructura y registro de eventos de paro no programados</p>
+          </div>
+          <button onclick="abrirModalRegistroParo()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-lg flex items-center gap-2 transition">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Registrar Evento de Paro</span>
+          </button>
+        </div>
+
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="text-xs text-slate-300 space-y-1">
+            <span class="font-bold text-emerald-400 uppercase tracking-wider text-[10px]">Fórmula Aplicada para Baseline:</span>
+            <p class="font-mono text-slate-200 bg-slate-950 p-2 rounded-lg border border-slate-800">
+              $$\text{Disponibilidad (\%)} = \left( \frac{\text{Horas Operativas Totales} - \text{Horas de Paro}}{\text{Horas Operativas Totales}} \right) \times 100$$
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <select id="dispFiltroMes" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none">
+              <option value="1">Enero</option>
+              <option value="2">Febrero</option>
+              <option value="3">Marzo</option>
+              <option value="4">Abril</option>
+              <option value="5">Mayo</option>
+              <option value="6">Junio</option>
+              <option value="7">Julio</option>
+              <option value="8">Agosto</option>
+              <option value="9">Septiembre</option>
+              <option value="10">Octubre</option>
+              <option value="11">Noviembre</option>
+              <option value="12">Diciembre</option>
+            </select>
+
+            <select id="dispFiltroAnio" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none">
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+            </select>
+
+            <button onclick="cargarKpisDisponibilidad()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition">
+              Consultar
+            </button>
+          </div>
+        </div>
+
+        <div id="gridSistemasDisponibilidad" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+        <div class="bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white">Bitácora de Paros de Sistemas Registrados en el Período</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-950 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
+                <tr>
+                  <th class="p-4">Sistema</th>
+                  <th class="p-4">Fecha / Hora Inicio</th>
+                  <th class="p-4">Fecha / Hora Fin</th>
+                  <th class="p-4">Horas de Paro</th>
+                  <th class="p-4">Motivo / Causa Raíz</th>
+                  <th class="p-4">Registrado Por</th>
+                </tr>
+              </thead>
+              <tbody id="tablaParosBody" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA 2: GESTIÓN DE TICKETS -->
+      <div id="seccionTickets" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Centro de Tickets de Soporte</h2>
+            <p class="text-slate-400 text-xs" id="lblSubtituloTickets">Cargando...</p>
+          </div>
+          <button onclick="abrirModalNuevoTicket()"
+            class="px-5 py-2.5 bg-gradient-to-r from-[#F67280] via-[#C06C84] to-[#6C5B7B] hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-lg shadow-[#C06C84]/25 flex items-center gap-2 transition transform active:scale-95">
+            <i class="fa-solid fa-plus"></i>
+            <span>Abrir Nuevo Ticket</span>
+          </button>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900/40 p-3 rounded-2xl border border-slate-800/80">
+          <div class="relative w-full sm:w-80">
+            <i class="fa-solid fa-filter absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" id="inputFiltroTickets" onkeyup="filtrarTablaTickets()" placeholder="Filtrar por estatus, usuario, tema, #..."
+              class="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C06C84]">
+          </div>
+          <div class="flex items-center gap-2 text-xs text-slate-400">
+            <span>Filtro rápido:</span>
+            <button onclick="aplicarFiltroEstatus('Abierto')" class="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 text-[11px] font-semibold transition">Abiertos</button>
+            <button onclick="aplicarFiltroEstatus('Cerrado')" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 text-[11px] font-semibold transition">Cerrados</button>
+            <button onclick="aplicarFiltroEstatus('')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition">Todos</button>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-950 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
+                <tr>
+                  <th class="p-4"># Ticket</th>
+                  <th class="p-4">Solicitante</th>
+                  <th class="p-4">Tema / Asunto</th>
+                  <th class="p-4">Prioridad / SLA</th>
+                  <th class="p-4">Estatus</th>
+                  <th class="p-4">Fecha y Hora</th>
+                  <th class="p-4 text-center">Detalle</th>
+                </tr>
+              </thead>
+              <tbody id="tablaTicketsBody" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA 3: TEMAS & SLAS -->
+      <div id="seccionTemas" class="space-y-6 hidden" data-privilegio="1">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-sitemap text-[#F67280]"></i>
+              <span>Estructura Temas & SLAs</span>
+            </h2>
+            <p class="text-slate-400 text-xs">Catálogo dinámico de categorías y asignación de tiempos de solución (SLA)</p>
+          </div>
+          <button onclick="abrirModalGestionTema()"
+            class="px-5 py-2.5 bg-gradient-to-r from-[#F67280] via-[#C06C84] to-[#6C5B7B] hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-lg shadow-[#C06C84]/25 flex items-center gap-2 transition transform active:scale-95">
+            <i class="fa-solid fa-plus"></i>
+            <span>Nuevo Tema</span>
+          </button>
+        </div>
+
+        <div class="bg-slate-900/80 border border-[#6C5B7B]/50 p-6 rounded-3xl shadow-2xl space-y-4">
+          <div id="arbolTemasContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
+
+      <!-- VISTA 4: GESTIÓN DE USUARIOS -->
+      <div id="seccionUsuarios" class="space-y-6 hidden" data-privilegio="1">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-user-shield text-emerald-400"></i>
+              <span>Catálogo de Usuarios</span>
+            </h2>
+            <p class="text-slate-400 text-xs">Administración de accesos, departamentos y asignación de roles de usuario</p>
+          </div>
+          <button onclick="abrirModalGestionUsuario()"
+            class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-700 hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition transform active:scale-95">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Nuevo Usuario</span>
+          </button>
+        </div>
+
+        <div class="bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-950 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
+                <tr>
+                  <th class="p-4"># ID</th>
+                  <th class="p-4">Usuario / Nombre</th>
+                  <th class="p-4">Correo Electrónico</th>
+                  <th class="p-4">Departamento</th>
+                  <th class="p-4">Rol Asignado</th>
+                  <th class="p-4">Permisos KPIs</th>
+                  <th class="p-4">Estatus</th>
+                  <th class="p-4 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tablaUsuariosBody" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA 5: ROLES Y PERMISOS -->
+      <div id="seccionRoles" class="space-y-6 hidden" data-privilegio="1">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-users-gear text-amber-400"></i>
+              <span>Catálogo de Roles y Definición de Permisos</span>
+            </h2>
+            <p class="text-slate-400 text-xs">Estructura de privilegios del sistema e identificación de niveles de acceso</p>
+          </div>
+          <button onclick="abrirModalGestionRol()"
+            class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-lg shadow-amber-500/20 flex items-center gap-2 transition transform active:scale-95">
+            <i class="fa-solid fa-shield-plus"></i>
+            <span>Nuevo Rol</span>
+          </button>
+        </div>
+
+        <div id="contenedorTarjetasRoles" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL: REGISTRAR PARO DE SISTEMA -->
+  <div id="modalRegistroParo" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Registrar Paro de Sistema
+        </h3>
+        <button onclick="cerrarModalParo()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="formRegistroParo" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-300 mb-1">Sistema Afectado</label>
+          <select id="prIdSistema" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white"></select>
+        </div>
+        <div>
+          <label class="block text-slate-300 mb-1">Fecha / Hora Inicio</label>
+          <input type="datetime-local" id="prFechaInicio" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white">
+        </div>
+        <div>
+          <label class="block text-slate-300 mb-1">Fecha / Hora Fin</label>
+          <input type="datetime-local" id="prFechaFin" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white">
+        </div>
+        <div>
+          <label class="block text-slate-300 mb-1">Motivo / Causa Raíz</label>
+          <textarea id="prMotivo" rows="2" required placeholder="Ej. Caída de enlace principal por falla del proveedor..." class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalParo()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl">Guardar Registro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: GESTIÓN DE USUARIO -->
+  <div id="modalGestionUsuario" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-pen text-emerald-400"></i>
+          <span id="lblTituloModalUsuario">Nuevo Usuario</span>
+        </h3>
+        <button onclick="cerrarModalUsuario()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="formGestionUsuario" class="space-y-4">
+        <input type="hidden" id="usrIdUsuario">
+
+        <div>
+          <label class="text-xs font-semibold text-slate-300 mb-1 block">Nombre Completo</label>
+          <input type="text" id="usrNombre" required placeholder="Ej. Juan Pérez" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-semibold text-slate-300 mb-1 block">Correo Electrónico</label>
+            <input type="email" id="usrEmail" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-300 mb-1 block">Contraseña</label>
+            <input type="password" id="usrPassword" placeholder="Dejar vacío si no cambia" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-semibold text-slate-300 mb-1 block">Departamento</label>
+            <input type="text" id="usrDepartamento" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-300 mb-1 block">Rol del Sistema</label>
+            <select id="usrIdRol" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white cursor-pointer"></select>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-3">
+          <label class="text-xs font-bold text-[#F8B195] flex items-center gap-2">
+            <i class="fa-solid fa-key"></i> Permisos de Acceso a Módulos (KPIs)
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <label class="flex items-center gap-2 text-[11px] text-slate-300 cursor-pointer bg-slate-900 p-2 rounded-xl border border-slate-800">
+              <input type="checkbox" id="usrModuloKpi" class="w-3.5 h-3.5 rounded bg-slate-950 text-emerald-500">
+              <span>Módulo KPIs</span>
+            </label>
+            <label class="flex items-center gap-2 text-[11px] text-slate-300 cursor-pointer bg-slate-900 p-2 rounded-xl border border-slate-800">
+              <input type="checkbox" id="usrKpiTicket" class="w-3.5 h-3.5 rounded bg-slate-950 text-emerald-500">
+              <span>KPI Tickets</span>
+            </label>
+            <label class="flex items-center gap-2 text-[11px] text-slate-300 cursor-pointer bg-slate-900 p-2 rounded-xl border border-slate-800">
+              <input type="checkbox" id="usrKpiTicketCriticos" class="w-3.5 h-3.5 rounded bg-slate-950 text-emerald-500">
+              <span>Sistemas Críticos</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="divEstadoUsuario" class="hidden">
+          <label class="text-xs font-semibold text-slate-300 mb-1 block">Estatus de Cuenta</label>
+          <select id="usrActivo" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+            <option value="1">Activo</option>
+            <option value="0">Inactivo</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalUsuario()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg">Guardar Usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: GESTIÓN DE ROL -->
+  <div id="modalGestionRol" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-shield-plus text-amber-400"></i> Registrar Nuevo Rol
+        </h3>
+        <button onclick="cerrarModalRol()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="formGestionRol" class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold text-slate-300 mb-1 block">Nombre del Rol</label>
+          <input type="text" id="rlNombre" required placeholder="Ej. Auditor de Calidad" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalRol()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl shadow-lg">Guardar Rol</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: GESTIÓN DE TEMA -->
+  <div id="modalGestionTema" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-[#6C5B7B]/50 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-folder-plus text-[#F67280]"></i>
+          <span id="lblTituloModalTema">Agregar Nuevo Tema</span>
+        </h3>
+        <button onclick="cerrarModalTema()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="formGestionTema" class="space-y-4">
+        <input type="hidden" id="tmIdTema">
+
+        <div>
+          <label class="text-xs font-semibold text-slate-300 mb-1 block">Nombre del Tema / Asunto</label>
+          <input type="text" id="tmNombre" required placeholder="Ej. NetSuite ERP / Módulo Producción" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold text-slate-300 mb-1 block">Prioridad / Criticidad SLA</label>
+          <select id="tmPrioridad" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white cursor-pointer"></select>
+        </div>
+
+        <div id="divEstadoTema" class="hidden">
+          <label class="text-xs font-semibold text-slate-300 mb-1 block">Estatus en Sistema</label>
+          <select id="tmActivo" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white cursor-pointer">
+            <option value="1">Activo</option>
+            <option value="0">Inactivo</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="cerrarModalTema()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-gradient-to-r from-[#F67280] to-[#C06C84] text-white text-xs font-bold rounded-xl shadow-lg">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: HILO DE CONVERSACIÓN DE TICKET -->
+  <div id="modalHiloTicket" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl flex flex-col h-[85vh]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>Ticket #<span id="hiloTicketId">00</span></span>
+            <span id="hiloBadgeEstatus" class="px-2 py-0.5 rounded-full text-[10px] font-bold">Abierto</span>
+          </h3>
+          <p id="hiloAsunto" class="text-xs text-slate-400 mt-0.5">Cargando...</p>
+        </div>
+        <button onclick="cerrarModalHilo()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div id="contenedorMensajes" class="flex-1 overflow-y-auto p-4 my-3 space-y-3 bg-slate-950/60 rounded-xl border border-slate-800/80"></div>
+
+      <div id="bannerTicketCerrado" class="hidden bg-slate-950 border border-slate-800 p-3 rounded-xl text-center text-xs text-slate-400 font-semibold">
+        <i class="fa-solid fa-lock text-rose-400 mr-2"></i> Este ticket se encuentra CERRADO. No se permiten más mensajes.
+      </div>
+
+      <div id="panelResponder" class="pt-2 border-t border-slate-800 space-y-2">
+        <textarea id="txtRespuesta" rows="2" placeholder="Escribe tu respuesta..." class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-[#C06C84]"></textarea>
+        <div class="flex items-center justify-between">
+          <button id="btnCerrarTicket" onclick="solicitarCierreTicket()" class="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs font-bold rounded-xl transition flex items-center gap-2">
+            <i class="fa-solid fa-check"></i>
+            <span>Marcar como Solucionado / Cerrado</span>
+          </button>
+          <button onclick="enviarRespuesta()" class="px-4 py-2 bg-gradient-to-r from-[#F67280] to-[#C06C84] text-white text-xs font-bold rounded-xl shadow-lg">
+            Enviar Respuesta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SOLUCIÓN ANTES DE CERRAR -->
+  <div id="modalSolucionCierre" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-shield-check text-emerald-400"></i> Solución del Ticket
+        </h3>
+        <button onclick="cerrarModalSolucion()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p class="text-xs text-slate-400">Describe la solución realizada. Se enviará un correo automático notificando al solicitante.</p>
+      <textarea id="txtSolucionCierre" rows="3" required placeholder="Ej. Se reconfiguraron los permisos de acceso en NetSuite..." class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-[#C06C84]"></textarea>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="cerrarModalSolucion()" class="px-3 py-1.5 bg-slate-800 text-slate-300 text-xs rounded-xl">Cancelar</button>
+        <button onclick="confirmarCierreConSolucion()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg">
+          Enviar Solución y Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NUEVO TICKET -->
+  <div id="modalNuevoTicket" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 sm:p-6">
+    <div class="bg-slate-900 border border-[#6C5B7B]/50 rounded-3xl w-full max-w-3xl p-6 sm:p-8 shadow-2xl space-y-6 overflow-hidden relative">
+      <div class="flex items-center justify-between border-b border-slate-800/80 pb-4 relative z-10">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#F67280] via-[#C06C84] to-[#6C5B7B] flex items-center justify-center text-white shadow-lg shadow-[#C06C84]/20">
+            <i class="fa-solid fa-ticket-simple text-base"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-extrabold text-white tracking-tight">Abrir Nuevo Ticket de Soporte</h3>
+            <p class="text-xs text-[#F8B195]/90 font-medium">Completa el formulario para canalizar tu solicitud al equipo de IT</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalNuevoTicket()" class="w-9 h-9 rounded-xl bg-slate-800/80 hover:bg-[#F67280]/20 text-slate-400 hover:text-[#F67280] transition flex items-center justify-center">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <form id="formNuevoTicket" class="space-y-5 relative z-10">
+        <div id="divSelectorAdminUser" class="hidden bg-slate-950/70 p-3.5 border border-[#6C5B7B]/40 rounded-2xl">
+          <label class="text-xs font-bold text-[#F8B195] flex items-center gap-1.5 mb-1.5">
+            <i class="fa-solid fa-user-gear"></i> Seleccionar Usuario Solicitante (Modo Administrador)
+          </label>
+          <select id="selUsuarioAdmin" onchange="seleccionarUsuarioDesdeAdmin()" class="w-full p-3 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-[#C06C84] transition cursor-pointer"></select>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-semibold text-slate-300 mb-1.5 block">Solicitante</label>
+            <div class="relative">
+              <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+              <input type="text" id="tkNombre" readonly class="w-full pl-9 pr-4 py-3 bg-slate-950/70 border border-slate-800 rounded-xl text-xs text-slate-300 font-medium focus:outline-none cursor-not-allowed">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-300 mb-1.5 block">Correo Electrónico</label>
+            <div class="relative">
+              <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+              <input type="email" id="tkEmail" readonly class="w-full pl-9 pr-4 py-3 bg-slate-950/70 border border-slate-800 rounded-xl text-xs text-slate-300 font-medium focus:outline-none cursor-not-allowed">
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div class="md:col-span-7">
+            <label class="text-xs font-semibold text-slate-300 mb-1.5 block">Tema de Ayuda / Categoría</label>
+            <select id="tkTema" onchange="actualizarPrioridadAutomatica()" required class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-xs font-medium text-white focus:outline-none focus:border-[#F67280] transition cursor-pointer"></select>
+          </div>
+          <div class="md:col-span-5">
+            <label class="text-xs font-semibold text-slate-300 mb-1.5 block">Prioridad / SLA (Asignación Auto)</label>
+            <input type="text" id="tkPrioridadTexto" readonly class="w-full p-3 bg-[#355C7D]/30 border border-[#355C7D] rounded-xl text-xs font-bold text-[#F8B195] focus:outline-none cursor-not-allowed">
+            <input type="hidden" id="tkPrioridadId">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold text-slate-300 mb-1.5 block">Observación / Detalle de la falla</label>
+          <textarea id="tkMensaje" rows="4" required placeholder="Describe detalladamente la falla..." class="w-full p-3.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#F67280] transition resize-none"></textarea>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-3 border-t border-slate-800/80">
+          <button type="button" onclick="cerrarModalNuevoTicket()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">Cancelar</button>
+          <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-[#F67280] via-[#C06C84] to-[#6C5B7B] hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-lg transition flex items-center gap-2">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+            <span>Guardar Ticket</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- IMPORTACIÓN DEL SCRIPT DE DISPONIBILIDAD -->
+  <script src="js/kpisDisponibilidad.js"></script>
+
+  <!-- LÓGICA PRINCIPAL DEL DASHBOARD -->
+  <script>
+    let ticketActualId = null;
+    let temasGlobales = [];
+    let prioridadesGlobales = [];
+    let usuariosGlobales = [];
+    let rolesGlobales = [];
+
+    const descripcionesRoles = {
+      1: 'Acceso total y configuración del sistema: creación/edición de usuarios, catálogo de temas, reasignaciones y cierre formal de tickets.',
+      2: 'Atención técnica y soporte: lectura general de tickets, respuesta en el hilo de conversación y aplicación de soluciones técnicas.',
+      3: 'Usuario final / Solicitante: apertura de tickets de soporte, seguimiento de sus propias incidencias y respuesta a personal de IT.'
+    };
+
+    function iniciarReloj() {
+      function actualizar() {
+        const ahora = new Date();
+        const opcionesFecha = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+        const fechaTexto = ahora.toLocaleDateString('es-MX', opcionesFecha);
+        const horaTexto = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+        const elHeader = document.getElementById('relojHeader');
+        if (elHeader) elHeader.innerText = `${fechaTexto} - ${horaTexto}`;
+      }
+      actualizar();
+      setInterval(actualizar, 1000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      iniciarReloj();
+
+      const usuarioLogueado = localStorage.getItem('usuarioDaker') || 'Oscar Diaz';
+      const emailLogueado = localStorage.getItem('emailDaker') || 'ivansistemas@therapedic.com.mx';
+      const rolLogueado = localStorage.getItem('rolDaker') || 'Administrador IT';
+      const idRolLogueado = parseInt(localStorage.getItem('idRolDaker') || '1');
+
+      const modulokpiPermiso = parseInt(localStorage.getItem('modulokpiDaker') || '0');
+      const kpiTicketPermiso = parseInt(localStorage.getItem('kpiTicketDaker') || '0');
+      const kpiCriticosPermiso = parseInt(localStorage.getItem('kpiTicketCriticosDaker') || '0');
+
+      document.getElementById('userName').innerText = usuarioLogueado;
+      document.getElementById('userRole').innerText = rolLogueado;
+      document.getElementById('bannerUser').innerText = usuarioLogueado;
+
+      document.getElementById('tkNombre').value = usuarioLogueado;
+      document.getElementById('tkEmail').value = emailLogueado;
+
+      const iniciales = usuarioLogueado.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('userAvatar').innerText = iniciales || 'OI';
+
+      if (idRolLogueado === 3) {
+        document.querySelectorAll('[data-privilegio="1"]').forEach(el => el.style.display = 'none');
+        document.getElementById('lblSubtituloTickets').innerText = 'Mis tickets pendientes y estado de atención';
+        document.getElementById('btnCerrarTicket').style.display = 'none';
+        document.getElementById('divSelectorAdminUser').classList.add('hidden');
+      } else {
+        document.getElementById('lblSubtituloTickets').innerText = 'Administración global de incidencias e historial de soporte';
+        document.getElementById('divSelectorAdminUser').classList.remove('hidden');
+      }
+
+      // EVALUACIÓN DE PERMISOS KPIS
+      const tienePadreKpi = (modulokpiPermiso === 1) || (idRolLogueado === 1);
+      const tieneHijoKpiTickets = (kpiTicketPermiso === 1) || (idRolLogueado === 1);
+      const tieneHijoKpiCriticos = (kpiCriticosPermiso === 1) || (idRolLogueado === 1);
+
+      document.getElementById('cardKpiModuloDashboard')?.classList.toggle('hidden', !tienePadreKpi);
+      document.getElementById('seccionNavKpis')?.classList.toggle('hidden', !tienePadreKpi);
+
+      document.getElementById('cardSubKpiTicket')?.classList.toggle('hidden', !tieneHijoKpiTickets);
+      document.getElementById('btnNavKpiTickets')?.classList.toggle('hidden', !tieneHijoKpiTickets);
+
+      document.getElementById('cardSubKpiDisponibilidad')?.classList.toggle('hidden', !tieneHijoKpiCriticos);
+      document.getElementById('btnNavKpiDisponibilidad')?.classList.toggle('hidden', !tieneHijoKpiCriticos);
+
+      const msgSinKpisHijos = document.getElementById('msgSinKpisHijos');
+      if (msgSinKpisHijos) {
+        msgSinKpisHijos.classList.toggle('hidden', tieneHijoKpiTickets || tieneHijoKpiCriticos);
+      }
+
+      cargarCatalogos();
+      cargarListaTickets();
+      cargarUsuariosTabla();
+      cargarRolesTarjetas();
+      if (typeof inicializarModuloDisponibilidad === 'function') {
+        inicializarModuloDisponibilidad();
+      }
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = '/index.html';
+    });
+
+    document.getElementById('toggleSidebar').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+    });
+
+    function mostrarSeccion(seccion) {
+      document.getElementById('seccionDashboard').classList.toggle('hidden', seccion !== 'dashboard');
+      document.getElementById('seccionTickets').classList.toggle('hidden', seccion !== 'tickets');
+      document.getElementById('seccionTemas').classList.toggle('hidden', seccion !== 'temas');
+      document.getElementById('seccionSubmenuKpis').classList.toggle('hidden', seccion !== 'submenuKpis');
+      document.getElementById('seccionKpiTickets').classList.toggle('hidden', seccion !== 'kpiTickets');
+      document.getElementById('seccionKpiDisponibilidad').classList.toggle('hidden', seccion !== 'kpiDisponibilidad');
+      document.getElementById('seccionUsuarios').classList.toggle('hidden', seccion !== 'usuarios');
+      document.getElementById('seccionRoles').classList.toggle('hidden', seccion !== 'roles');
+
+      const modoActivo = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#C06C84] to-[#6C5B7B] text-white font-semibold text-xs shadow-lg transition';
+      const modoInactivo = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs font-semibold group';
+
+      document.getElementById('btnNavDashboard').className = seccion === 'dashboard' ? 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#C06C84] to-[#6C5B7B] text-white font-semibold text-xs shadow-lg transition' : 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs font-semibold';
+      document.getElementById('btnNavTickets').className = seccion === 'tickets' ? modoActivo : modoInactivo;
+
+      const btnTemas = document.getElementById('btnNavTemas');
+      if (btnTemas) btnTemas.className = seccion === 'temas' ? modoActivo : modoInactivo;
+
+      const btnSubmenuKpis = document.getElementById('btnNavSubmenuKpis');
+      if (btnSubmenuKpis) btnSubmenuKpis.className = seccion === 'submenuKpis' ? modoActivo : modoInactivo;
+
+      const btnKpi = document.getElementById('btnNavKpiTickets');
+      if (btnKpi) btnKpi.className = seccion === 'kpiTickets' ? 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#C06C84] to-[#6C5B7B] text-white font-semibold text-xs shadow-lg transition pl-6' : 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-xs font-semibold group pl-6';
+
+      const btnUsuarios = document.getElementById('btnNavUsuarios');
+      if (btnUsuarios) btnUsuarios.className = seccion === 'usuarios' ? modoActivo : modoInactivo;
+
+      const btnRoles = document.getElementById('btnNavRoles');
+      if (btnRoles) btnRoles.className = seccion === 'roles' ? modoActivo : modoInactivo;
+
+      if (seccion === 'kpiTickets') {
+        cargarKpisTickets();
+      } else if (seccion === 'kpiDisponibilidad' && typeof cargarKpisDisponibilidad === 'function') {
+        cargarKpisDisponibilidad();
+      }
+
+      if (window.innerWidth < 1024) {
+        document.getElementById('sidebar').classList.add('-translate-x-full');
+      }
+    }
+
+    async function cargarKpisTickets() {
+      const fechaInicio = document.getElementById('kpiFechaInicio').value;
+      const fechaFin = document.getElementById('kpiFechaFin').value;
+
+      let url = '/api/kpis/tickets';
+      const params = new URLSearchParams();
+      if (fechaInicio) params.append('fechaInicio', fechaInicio);
+      if (fechaFin) params.append('fechaFin', fechaFin);
+
+      if (params.toString()) url += `?${params.toString()}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.ok) {
+          document.getElementById('kpiTotalTickets').innerText = data.resumen.total;
+          document.getElementById('kpiPorcentajeSla').innerText = `${data.resumen.porcentajeCumplimiento}%`;
+          document.getElementById('kpiLogrados').innerText = data.resumen.logrados;
+          document.getElementById('kpiIncumplidos').innerText = data.resumen.incumplidos;
+
+          const tbody = document.getElementById('tablaKpisBody');
+          if (!data.tickets || data.tickets.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">No hay información de tickets en este rango.</td></tr>`;
+            return;
+          }
+
+          tbody.innerHTML = data.tickets.map(t => `
+            <tr class="hover:bg-slate-800/40 transition border-b border-slate-800/40">
+              <td class="p-4 font-bold text-[#F67280]">#${t.IdTicket}</td>
+              <td class="p-4">
+                <div class="font-bold text-white">${t.NombreSolicitante}</div>
+                <div class="text-[10px] text-slate-500">${t.EmailSolicitante}</div>
+              </td>
+              <td class="p-4 text-slate-200">${t.NombreTema}</td>
+              <td class="p-4">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#355C7D]/30 text-[#F8B195] border border-[#355C7D]/50">${t.NombrePrioridad} (${t.HorasSolucion}h)</span>
+              </td>
+              <td class="p-4 text-slate-300 font-medium">${t.HorasTranscurridas} h</td>
+              <td class="p-4">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${t.EstadoSLA === 'Logrado' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">
+                  ${t.EstadoSLA}
+                </span>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Error al consultar KPIs de tickets:', err);
+      }
+    }
+
+    function filtrarTablaTickets() {
+      const filtro = document.getElementById('inputFiltroTickets').value.toLowerCase().trim();
+      const filas = document.querySelectorAll('#tablaTicketsBody tr');
+
+      filas.forEach(fila => {
+        if (fila.children.length === 1) return;
+        const textoFila = fila.innerText.toLowerCase();
+        fila.style.display = textoFila.includes(filtro) ? '' : 'none';
+      });
+    }
+
+    function aplicarFiltroEstatus(estatus) {
+      document.getElementById('inputFiltroTickets').value = estatus;
+      filtrarTablaTickets();
+    }
+
+    function filtrarDesdeGlobal() {
+      const texto = document.getElementById('inputBuscadorGlobal').value;
+      mostrarSeccion('tickets');
+      document.getElementById('inputFiltroTickets').value = texto;
+      filtrarTablaTickets();
+    }
+
+    async function cargarCatalogos() {
+      try {
+        const res = await fetch('/api/tickets/catalogos');
+        const data = await res.json();
+        temasGlobales = data.temas || [];
+        prioridadesGlobales = data.prioridades || [];
+        usuariosGlobales = data.usuarios || [];
+
+        const selTema = document.getElementById('tkTema');
+        if (selTema) {
+          selTema.innerHTML = temasGlobales.map(t => `<option value="${t.IdTema}">${t.NombreTema}</option>`).join('');
+        }
+
+        const selUser = document.getElementById('selUsuarioAdmin');
+        const emailLogueado = localStorage.getItem('emailDaker');
+        if (selUser) {
+          selUser.innerHTML = '<option value="">-- Mismo Usuario Actual --</option>' +
+            usuariosGlobales.map(u => `<option value="${u.Email}" ${u.Email === emailLogueado ? 'selected' : ''}>${u.NombreCompleto} (${u.Email})</option>`).join('');
+        }
+
+        const selPrioridadAdmin = document.getElementById('tmPrioridad');
+        if (selPrioridadAdmin) {
+          selPrioridadAdmin.innerHTML = prioridadesGlobales.map(p => `<option value="${p.IdPrioridad}">${p.NombrePrioridad} (SLA: ${p.HorasSolucion}h)</option>`).join('');
+        }
+
+        actualizarPrioridadAutomatica();
+        renderizarArbolTemas();
+      } catch (err) {
+        console.error('Error al cargar catálogos:', err);
+      }
+    }
+
+    async function cargarUsuariosTabla() {
+      const tbody = document.getElementById('tablaUsuariosBody');
+      if (!tbody) return;
+
+      try {
+        const res = await fetch('/api/admin/usuarios');
+        const usuarios = await res.json();
+
+        if (!usuarios || usuarios.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">No hay usuarios registrados.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = usuarios.map(u => `
+          <tr class="hover:bg-slate-800/40 transition border-b border-slate-800/40">
+            <td class="p-4 font-bold text-slate-400">#${u.IdUsuario}</td>
+            <td class="p-4 font-bold text-white">${u.NombreCompleto}</td>
+            <td class="p-4 text-slate-300">${u.Email}</td>
+            <td class="p-4 text-slate-300">${u.Departamento || 'N/A'}</td>
+            <td class="p-4">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#355C7D]/30 text-[#F8B195] border border-[#355C7D]/50">${u.NombreRol}</span>
+            </td>
+            <td class="p-4">
+              <div class="flex gap-1.5 flex-wrap">
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold ${u.modulokpi ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-slate-800 text-slate-500'}">Módulo KPI</span>
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold ${u.kpiTicket ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'bg-slate-800 text-slate-500'}">KPI Ticket</span>
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold ${u.KpiTicketCriticos ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-500'}">Sistemas Críticos</span>
+              </div>
+            </td>
+            <td class="p-4">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${u.Activo ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">
+                ${u.Activo ? 'Activo' : 'Inactivo'}
+              </span>
+            </td>
+            <td class="p-4 text-center">
+              <button onclick="abrirModalGestionUsuario(${u.IdUsuario})" title="Editar Usuario" class="p-2 rounded-lg bg-slate-800 hover:bg-[#C06C84] text-slate-300 hover:text-white transition">
+                <i class="fa-solid fa-user-pen text-xs"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('Error al cargar usuarios:', err);
+      }
+    }
+
+    async function cargarRolesTarjetas() {
+      const container = document.getElementById('contenedorTarjetasRoles');
+      const selRolUser = document.getElementById('usrIdRol');
+      if (!container) return;
+
+      try {
+        const res = await fetch('/api/admin/roles');
+        rolesGlobales = await res.json();
+
+        if (selRolUser) {
+          selRolUser.innerHTML = rolesGlobales.map(r => `<option value="${r.IdRol}">${r.NombreRol}</option>`).join('');
+        }
+
+        container.innerHTML = rolesGlobales.map(r => {
+          const desc = descripcionesRoles[r.IdRol] || 'Nivel de acceso personalizado y asignación de actividades en plataforma.';
+          return `
+            <div class="p-6 bg-slate-900/80 border border-slate-800 hover:border-amber-500/50 rounded-3xl shadow-xl space-y-4 transition group">
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold text-sm">
+                  #${r.IdRol}
+                </div>
+                <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                  <i class="fa-solid fa-users mr-1.5 text-amber-400"></i>${r.TotalUsuarios || 0} Usuarios
+                </span>
+              </div>
+              <h3 class="text-base font-extrabold text-white group-hover:text-amber-300 transition">${r.NombreRol}</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">${desc}</p>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Error al cargar roles:', err);
+      }
+    }
+
+    function abrirModalGestionUsuario(idUsuario = null) {
+      const modal = document.getElementById('modalGestionUsuario');
+      const form = document.getElementById('formGestionUsuario');
+      const lblTitulo = document.getElementById('lblTituloModalUsuario');
+      const divEstado = document.getElementById('divEstadoUsuario');
+
+      form.reset();
+
+      if (idUsuario) {
+        fetch('/api/admin/usuarios').then(r => r.json()).then(lista => {
+          const u = lista.find(item => item.IdUsuario === idUsuario);
+          if (u) {
+            lblTitulo.innerText = 'Editar Usuario';
+            document.getElementById('usrIdUsuario').value = u.IdUsuario;
+            document.getElementById('usrNombre').value = u.NombreCompleto;
+            document.getElementById('usrEmail').value = u.Email;
+            document.getElementById('usrDepartamento').value = u.Departamento || '';
+            document.getElementById('usrIdRol').value = u.IdRol;
+            document.getElementById('usrModuloKpi').checked = u.modulokpi === 1 || u.modulokpi === true;
+            document.getElementById('usrKpiTicket').checked = u.kpiTicket === 1 || u.kpiTicket === true;
+            document.getElementById('usrKpiTicketCriticos').checked = u.KpiTicketCriticos === 1 || u.KpiTicketCriticos === true;
+            document.getElementById('usrActivo').value = u.Activo ? '1' : '0';
+            divEstado.classList.remove('hidden');
+          }
+        });
+      } else {
+        lblTitulo.innerText = 'Nuevo Usuario';
+        document.getElementById('usrIdUsuario').value = '';
+        document.getElementById('usrModuloKpi').checked = false;
+        document.getElementById('usrKpiTicket').checked = false;
+        document.getElementById('usrKpiTicketCriticos').checked = false;
+        divEstado.classList.add('hidden');
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function cerrarModalUsuario() { document.getElementById('modalGestionUsuario').classList.add('hidden'); }
+
+    document.getElementById('formGestionUsuario').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const idUsuario = document.getElementById('usrIdUsuario').value;
+      const nombreCompleto = document.getElementById('usrNombre').value;
+      const email = document.getElementById('usrEmail').value;
+      const password = document.getElementById('usrPassword').value;
+      const departamento = document.getElementById('usrDepartamento').value;
+      const idRol = document.getElementById('usrIdRol').value;
+      const modulokpi = document.getElementById('usrModuloKpi').checked ? 1 : 0;
+      const kpiTicket = document.getElementById('usrKpiTicket').checked ? 1 : 0;
+      const kpiTicketCriticos = document.getElementById('usrKpiTicketCriticos').checked ? 1 : 0;
+      const activo = document.getElementById('usrActivo').value === '1';
+
+      const url = idUsuario ? `/api/admin/usuarios/${idUsuario}` : '/api/admin/usuarios';
+      const method = idUsuario ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombreCompleto, email, password, departamento, idRol, modulokpi, kpiTicket, kpiTicketCriticos, activo })
+        });
+
+        if (res.ok) {
+          cerrarModalUsuario();
+          await cargarUsuariosTabla();
+          await cargarCatalogos();
+        }
+      } catch (err) {
+        console.error('Error al guardar usuario:', err);
+      }
+    });
+
+    function abrirModalGestionRol() { document.getElementById('modalGestionRol').classList.remove('hidden'); }
+    function cerrarModalRol() { document.getElementById('modalGestionRol').classList.add('hidden'); }
+
+    document.getElementById('formGestionRol').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nombreRol = document.getElementById('rlNombre').value;
+
+      try {
+        const res = await fetch('/api/admin/roles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombreRol })
+        });
+
+        if (res.ok) {
+          cerrarModalRol();
+          await cargarRolesTarjetas();
+        }
+      } catch (err) {
+        console.error('Error al registrar rol:', err);
+      }
+    });
+
+    function renderizarArbolTemas() {
+      const container = document.getElementById('arbolTemasContainer');
+      if (!container) return;
+
+      if (!temasGlobales || temasGlobales.length === 0) {
+        container.innerHTML = `<div class="p-6 col-span-full text-center text-xs text-slate-500">No hay temas configurados en el catálogo.</div>`;
+        return;
+      }
+
+      container.innerHTML = temasGlobales.map(t => `
+        <div class="p-4 bg-slate-950/80 border border-slate-800/80 hover:border-[#C06C84] rounded-2xl transition shadow-lg flex items-center justify-between gap-3 group">
+          <div class="min-w-0 flex-1 space-y-2">
+            <div class="text-xs font-bold text-white truncate group-hover:text-[#F8B195] transition">${t.NombreTema}</div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#355C7D]/30 text-[#F8B195] border border-[#355C7D]/50">${t.NombrePrioridad || 'Normal'}</span>
+              <span class="text-[11px] text-slate-400 font-medium"><i class="fa-regular fa-clock mr-1 text-[#F67280]"></i>${t.HorasSolucion || 24}h SLA</span>
+            </div>
+          </div>
+          <button onclick="abrirModalGestionTema(${t.IdTema})" title="Editar Tema" class="p-2.5 rounded-xl bg-slate-800 hover:bg-[#C06C84] text-slate-300 hover:text-white transition shadow flex-shrink-0">
+            <i class="fa-solid fa-pen text-xs"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function abrirModalGestionTema(idTema = null) {
+      const modal = document.getElementById('modalGestionTema');
+      const form = document.getElementById('formGestionTema');
+      const lblTitulo = document.getElementById('lblTituloModalTema');
+      const divEstado = document.getElementById('divEstadoTema');
+
+      form.reset();
+
+      if (idTema) {
+        const tema = temasGlobales.find(t => t.IdTema === idTema);
+        if (tema) {
+          lblTitulo.innerText = 'Editar Tema / Asunto';
+          document.getElementById('tmIdTema').value = tema.IdTema;
+          document.getElementById('tmNombre').value = tema.NombreTema;
+          document.getElementById('tmPrioridad').value = tema.IdPrioridad;
+          document.getElementById('tmActivo').value = tema.Activo ? '1' : '0';
+          divEstado.classList.remove('hidden');
+        }
+      } else {
+        lblTitulo.innerText = 'Agregar Nuevo Tema';
+        document.getElementById('tmIdTema').value = '';
+        divEstado.classList.add('hidden');
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function cerrarModalTema() { document.getElementById('modalGestionTema').classList.add('hidden'); }
+
+    document.getElementById('formGestionTema').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const idTema = document.getElementById('tmIdTema').value;
+      const nombreTema = document.getElementById('tmNombre').value;
+      const idPrioridad = document.getElementById('tmPrioridad').value;
+      const activo = document.getElementById('tmActivo').value === '1';
+
+      const url = idTema ? `/api/tickets/temas/${idTema}` : '/api/tickets/temas';
+      const method = idTema ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombreTema, idPrioridad, activo })
+        });
+
+        if (res.ok) {
+          cerrarModalTema();
+          await cargarCatalogos();
+        }
+      } catch (err) {
+        console.error('Error al guardar tema:', err);
+      }
+    });
+
+    function seleccionarUsuarioDesdeAdmin() {
+      const emailSel = document.getElementById('selUsuarioAdmin').value;
+      const usrObj = usuariosGlobales.find(u => u.Email === emailSel);
+
+      if (usrObj) {
+        document.getElementById('tkNombre').value = usrObj.NombreCompleto;
+        document.getElementById('tkEmail').value = usrObj.Email;
+      } else {
+        document.getElementById('tkNombre').value = localStorage.getItem('usuarioDaker');
+        document.getElementById('tkEmail').value = localStorage.getItem('emailDaker');
+      }
+    }
+
+    function actualizarPrioridadAutomatica() {
+      const elTema = document.getElementById('tkTema');
+      if (!elTema || !elTema.value) return;
+
+      const idTemaSeleccionado = parseInt(elTema.value);
+      const temaObjeto = temasGlobales.find(t => t.IdTema === idTemaSeleccionado);
+
+      if (temaObjeto) {
+        document.getElementById('tkPrioridadTexto').value = `${temaObjeto.NombrePrioridad || 'Normal'} (SLA: ${temaObjeto.HorasSolucion || 24}h)`;
+        document.getElementById('tkPrioridadId').value = temaObjeto.IdPrioridad || 2;
+      }
+    }
+
+    async function cargarListaTickets() {
+      const email = localStorage.getItem('emailDaker') || 'ivansistemas@therapedic.com.mx';
+      const idRol = localStorage.getItem('idRolDaker') || '1';
+
+      try {
+        const res = await fetch(`/api/tickets/lista?email=${encodeURIComponent(email)}&idRol=${idRol}`);
+        const tickets = await res.json();
+
+        document.getElementById('badgeTotalTickets').innerText = tickets ? tickets.length : 0;
+        const tbody = document.getElementById('tablaTicketsBody');
+
+        if (!tickets || tickets.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No hay tickets pendientes registrados.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = tickets.map(t => {
+          const fechaHoraFormateada = new Date(t.FechaCreacion).toLocaleString('es-MX', {
+            timeZone: 'UTC',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+
+          return `
+            <tr class="hover:bg-slate-800/40 transition border-b border-slate-800/40">
+              <td class="p-4 font-bold text-[#F67280]">#${t.IdTicket}</td>
+              <td class="p-4">
+                <div class="font-bold text-white">${t.NombreSolicitante}</div>
+                <div class="text-[10px] text-slate-500">${t.EmailSolicitante}</div>
+              </td>
+              <td class="p-4">
+                <div class="font-semibold text-slate-200">${t.NombreTema}</div>
+              </td>
+              <td class="p-4">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#355C7D]/30 text-[#F8B195] border border-[#355C7D]/50">${t.NombrePrioridad}</span>
+              </td>
+              <td class="p-4">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${t.Estatus === 'Abierto' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'}">${t.Estatus}</span>
+              </td>
+              <td class="p-4 text-slate-300 text-[11px] font-medium whitespace-nowrap">
+                <i class="fa-regular fa-clock mr-1 text-[#F8B195]"></i>${fechaHoraFormateada}
+              </td>
+              <td class="p-4 text-center">
+                <button onclick="verHiloTicket(${t.IdTicket})" title="Ver Hilo de Conversación" class="p-2 rounded-lg bg-[#C06C84]/20 hover:bg-[#C06C84] text-[#F8B195] hover:text-white transition">
+                  <i class="fa-solid fa-eye text-sm"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        filtrarTablaTickets();
+      } catch (err) {
+        console.error('Error al cargar la lista de tickets:', err);
+      }
+    }
+
+    function abrirModalNuevoTicket() { document.getElementById('modalNuevoTicket').classList.remove('hidden'); }
+    function cerrarModalNuevoTicket() { document.getElementById('modalNuevoTicket').classList.add('hidden'); }
+    function cerrarModalHilo() { document.getElementById('modalHiloTicket').classList.add('hidden'); }
+    function cerrarModalSolucion() { document.getElementById('modalSolucionCierre').classList.add('hidden'); }
+
+    document.getElementById('formNuevoTicket').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btnSubmit = e.target.querySelector('button[type="submit"]');
+      btnSubmit.disabled = true;
+
+      const body = {
+        nombre: document.getElementById('tkNombre').value,
+        email: document.getElementById('tkEmail').value,
+        idTema: document.getElementById('tkTema').value,
+        idPrioridad: document.getElementById('tkPrioridadId').value,
+        mensaje: document.getElementById('tkMensaje').value
+      };
+
+      try {
+        const res = await fetch('/api/tickets/nuevo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        if (res.ok) {
+          cerrarModalNuevoTicket();
+          cargarListaTickets();
+          document.getElementById('tkMensaje').value = '';
+        }
+      } catch (err) {
+        console.error('Error al guardar ticket:', err);
+      } finally {
+        btnSubmit.disabled = false;
+      }
+    });
+
+    async function verHiloTicket(id) {
+      if (!id) return;
+
+      ticketActualId = id;
+      const modal = document.getElementById('modalHiloTicket');
+      const contenedor = document.getElementById('contenedorMensajes');
+
+      document.getElementById('hiloTicketId').innerText = id;
+      modal.classList.remove('hidden');
+      contenedor.innerHTML = `
+        <div class="p-8 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-2">
+          <i class="fa-solid fa-spinner fa-spin text-xl text-[#C06C84]"></i>
+          <span>Cargando mensajes del ticket #${id}...</span>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(`/api/tickets/detalle/${id}`);
+        if (!res.ok) throw new Error(`Respuesta del servidor: ${res.status}`);
+
+        const data = await res.json();
+
+        if (!data || !data.ticket) {
+          contenedor.innerHTML = `<div class="p-6 text-center text-xs text-rose-400">No se encontró información para el ticket #${id}.</div>`;
+          return;
+        }
+
+        const ticket = data.ticket;
+        const estatus = ticket.Estatus || 'Abierto';
+
+        document.getElementById('hiloAsunto').innerText = `${ticket.NombreTema || 'Sin Tema'} - Solicitado por: ${ticket.NombreSolicitante || 'Usuario'}`;
+
+        const badgeEstatus = document.getElementById('hiloBadgeEstatus');
+        badgeEstatus.innerText = estatus;
+        badgeEstatus.className = `px-2 py-0.5 rounded-full text-[10px] font-bold ${estatus === 'Abierto' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'}`;
+
+        const estaCerrado = estatus === 'Cerrado';
+        document.getElementById('bannerTicketCerrado').classList.toggle('hidden', !estaCerrado);
+        document.getElementById('panelResponder').classList.toggle('hidden', estaCerrado);
+
+        const mensajes = data.hilo || [];
+        if (mensajes.length === 0) {
+          contenedor.innerHTML = '<div class="p-6 text-center text-xs text-slate-500">No hay mensajes registrados en este ticket.</div>';
+        } else {
+          contenedor.innerHTML = mensajes.map(m => {
+            const fechaMsg = m.FechaRegistro ? new Date(m.FechaRegistro).toLocaleString('es-MX', {
+              timeZone: 'UTC', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
+            }) : '';
+
+            const esIT = m.EsSoporteIT;
+            const remitente = m.RemitenteNombre || 'Usuario';
+            const textoMensaje = m.Mensaje || '';
+
+            return `
+              <div class="flex flex-col ${esIT ? 'items-end' : 'items-start'} my-2">
+                <div class="text-[10px] text-slate-400 mb-1">
+                  <b>${remitente}</b> &bull; ${fechaMsg}
+                </div>
+                <div class="p-3 rounded-2xl text-xs max-w-md ${esIT ? 'bg-gradient-to-r from-[#C06C84] to-[#6C5B7B] text-white rounded-br-none' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'}">
+                  ${textoMensaje}
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Error al abrir el hilo del ticket:', err);
+        contenedor.innerHTML = `<div class="p-6 text-center text-xs text-rose-400">No se pudo cargar la conversación del ticket.</div>`;
+      }
+    }
+
+    async function enviarRespuesta() {
+      const msg = document.getElementById('txtRespuesta').value;
+      if (!msg.trim()) return;
+
+      const usuarioLogueado = localStorage.getItem('usuarioDaker') || 'Oscar Diaz';
+      const emailLogueado = localStorage.getItem('emailDaker') || 'ivansistemas@therapedic.com.mx';
+      const idRolLogueado = localStorage.getItem('idRolDaker') || '1';
+
+      await fetch('/api/tickets/responder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idTicket: ticketActualId,
+          remitenteNombre: usuarioLogueado,
+          remitenteEmail: emailLogueado,
+          esSoporteIT: parseInt(idRolLogueado) !== 3,
+          mensaje: msg
+        })
+      });
+
+      document.getElementById('txtRespuesta').value = '';
+      verHiloTicket(ticketActualId);
+    }
+
+    function solicitarCierreTicket() {
+      document.getElementById('txtSolucionCierre').value = '';
+      document.getElementById('modalSolucionCierre').classList.remove('hidden');
+    }
+
+    async function confirmarCierreConSolucion() {
+      const solucion = document.getElementById('txtSolucionCierre').value;
+      if (!solucion.trim()) {
+        alert('Por favor describe la solución realizada antes de cerrar el ticket.');
+        return;
+      }
+
+      const usuarioLogueado = localStorage.getItem('usuarioDaker') || 'Oscar Diaz';
+      const emailLogueado = localStorage.getItem('emailDaker') || 'ivansistemas@therapedic.com.mx';
+
+      await fetch('/api/tickets/estatus', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idTicket: ticketActualId,
+          estatus: 'Cerrado',
+          solucion: solucion,
+          remitenteNombre: usuarioLogueado,
+          remitenteEmail: emailLogueado
+        })
+      });
+
+      cerrarModalSolucion();
+      cerrarModalHilo();
+      cargarListaTickets();
+    }
+  </script>
+</body>
+
+</html>
